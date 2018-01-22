@@ -1,4 +1,4 @@
-oVirt dpdk Setup
+oVirt DPDK Setup
 ================
 
 The `oVirt.dpdk-setup` role enables you to set up Open vSwitch with DPDK support.
