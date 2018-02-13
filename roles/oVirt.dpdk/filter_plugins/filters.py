@@ -47,12 +47,16 @@ class FilterModule(object):
         else:
             return ""
 
+    def _get_nic_cpus_without_zero_core(self, nic):
+        local_cpu_list = self._get_nic_cpu_list(nic)
+        if self._is_first_core_zero(local_cpu_list):
+            local_cpu_list = self._remove_first_core(local_cpu_list)
+        return local_cpu_list
+
     def get_cpu_list(self, nics):
         cores = []
         for nic in nics:
-            local_cpu_list = self._get_nic_cpu_list(nic)
-            if self._is_first_core_zero(local_cpu_list):
-                local_cpu_list = self._remove_first_core(local_cpu_list)
+            local_cpu_list = self._get_nic_cpus_without_zero_core(nic)
             if local_cpu_list not in cores:
                 cores.append(local_cpu_list)
         return ','.join(cores)
@@ -73,7 +77,7 @@ class FilterModule(object):
                 nics_per_numa[numa_node] = {}
                 nics_per_numa[numa_node]['nics'] = 1
                 nics_per_numa[numa_node]['cpu_list'] = \
-                    self._get_nic_cpu_list(nic)
+                    self._get_nic_cpus_without_zero_core(nic)
 
         return nics_per_numa
 
