@@ -15,11 +15,11 @@
 
 - set_fact: "cpu_list={{ nics | get_cpu_list}}"
 
-- set_fact: "nics_per_numa={{ nics | get_nics_per_numa}}"
+- set_fact: "nics_numa_info={{ nics | get_dpdk_nics_numa_info}}"
 
 - name: print nics per numa
   debug:
-    msg: "nics_per_numa={{ nics | get_nics_per_numa}}"
+    msg: "nics_numa_info={{ nics | get_dpdk_nics_numa_info}}"
 
 - name: add isolated cpus to tuned
   lineinfile:

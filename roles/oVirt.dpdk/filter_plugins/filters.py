@@ -7,7 +7,8 @@ class FilterModule(object):
         return {
             'get_pci_addresses': self.get_pci_addresses,
             'get_cpu_list': self.get_cpu_list,
-            'get_nics_per_numa': self.get_nics_per_numa
+            'get_dpdk_nics_numa_info': self.get_dpdk_nics_numa_info,
+            'is_1gb_hugepages_enabled': self.is_1gb_hugepages_enabled,
         }
 
     def _get_pci_address(self, nic):
@@ -62,13 +63,24 @@ class FilterModule(object):
             pci_addresses.append(self._get_pci_address(nic))
         return pci_addresses
 
-    def get_nics_per_numa(self, nics):
+    def get_dpdk_nics_numa_info(self, nics):
         nics_per_numa = {}
         for nic in nics:
-            numa_node = self._get_numa_node(nic)
+            numa_node = int(self._get_numa_node(nic))
             if numa_node in nics_per_numa:
-                nics_per_numa[int(numa_node)] += 1
+                nics_per_numa[numa_node]['nics'] += 1
             else:
-                nics_per_numa[int(numa_node)] = 1
+                nics_per_numa[numa_node] = {}
+                nics_per_numa[numa_node]['nics'] = 1
+                nics_per_numa[numa_node]['cpu_list'] = \
+                    self._get_nic_cpu_list(nic)
 
         return nics_per_numa
+
+    def is_1gb_hugepages_enabled(self):
+        cmd = "grep -q pdpe1gb /proc/cpuinfo"
+        proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        output, error = proc.communicate()
+        if output:
+            return True
+        return False
