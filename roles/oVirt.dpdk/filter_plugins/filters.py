@@ -8,7 +8,6 @@ class FilterModule(object):
             'get_pci_addresses': self.get_pci_addresses,
             'get_cpu_list': self.get_cpu_list,
             'get_dpdk_nics_numa_info': self.get_dpdk_nics_numa_info,
-            'is_1gb_hugepages_enabled': self.is_1gb_hugepages_enabled,
         }
 
     def _get_pci_address(self, nic):
@@ -80,11 +79,3 @@ class FilterModule(object):
                     self._get_nic_cpus_without_zero_core(nic)
 
         return nics_per_numa
-
-    def is_1gb_hugepages_enabled(self):
-        cmd = "grep -q pdpe1gb /proc/cpuinfo"
-        proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-        output, error = proc.communicate()
-        if output:
-            return True
-        return False
